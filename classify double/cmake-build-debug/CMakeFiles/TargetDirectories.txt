@@ -1,3 +1,0 @@
-/home/ivanander/dev/MADE/C++/made-cpp-2020-hw/classify double/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/home/ivanander/dev/MADE/C++/made-cpp-2020-hw/classify double/cmake-build-debug/CMakeFiles/edit_cache.dir
-/home/ivanander/dev/MADE/C++/made-cpp-2020-hw/classify double/cmake-build-debug/CMakeFiles/classify_double.dir
