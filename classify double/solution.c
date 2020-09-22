@@ -18,13 +18,6 @@ bool getBit (const uint64_t number, const uint8_t index) {
     return tmp;
 }
 
-uint64_t invertBit (const uint64_t number, const uint8_t index) {
-    return getBit (number, index)
-        ? number ^ (1 << index)
-            : number | (1 << index);
-}
-
-
 /**
  * Checkers here:
  */
@@ -47,7 +40,7 @@ bool checkForMinusInf (uint64_t number) {
 
 bool not_null_or_inf (uint64_t number) {
     return !checkForPlusZero(number) && !checkForMinusZero(number)
-            && !checkForPlusInf(number) && !checkForMinusInf(number);
+           && !checkForPlusInf(number) && !checkForMinusInf(number);
 }
 
 bool checkForSignalingNan (uint64_t number) {
@@ -57,27 +50,27 @@ bool checkForSignalingNan (uint64_t number) {
 
 bool checkForQuietNan (uint64_t number) {
     return not_null_or_inf(number)
-            && ((number & 0x7ff8000000000000) == 0x7ff8000000000000);
+           && ((number & 0x7ff8000000000000) == 0x7ff8000000000000);
 }
 
 bool checkForPlusNormal (uint64_t number) {
     return not_null_or_inf(number)
-            && !checkForQuietNan(number) && !checkForSignalingNan(number)
-            && ((number & 0xfff8000000000000) < 0x7fff000000000000)
-            && ((number & 0xfff8000000000000) > 0x0008000000000000);
+           && !checkForQuietNan(number) && !checkForSignalingNan(number)
+           && ((number & 0xfff8000000000000) < 0x7fff000000000000)
+           && ((number & 0xfff8000000000000) > 0x0008000000000000);
 }
 
 bool checkForMinusNormal (uint64_t number) {
     return not_null_or_inf(number)
-            && !checkForQuietNan(number) && !checkForSignalingNan(number)
-            && ((number & 0xfff8000000000000) < 0xfff0000000000000)
-            && ((number & 0xfff8000000000000) > 0x0008000000000000);
+           && !checkForQuietNan(number) && !checkForSignalingNan(number)
+           && ((number & 0xfff8000000000000) < 0xfff0000000000000)
+           && ((number & 0xfff8000000000000) > 0x0008000000000000);
 }
 
 bool checkForPlusDenormal (uint64_t number) {
     return not_null_or_inf(number)
            && !checkForQuietNan(number) && !checkForSignalingNan(number)
-           && (!(number & 0xfff0000000000000) < 0x0010000000000000);
+           && ((number & 0xfff0000000000000) == 0x0000000000000000);
 }
 
 bool checkForMinusDenormal (uint64_t number) {
