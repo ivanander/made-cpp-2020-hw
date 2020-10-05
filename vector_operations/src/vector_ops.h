@@ -1,7 +1,7 @@
 #pragma once
-#include <vector>
-#include <iostream>
 #include <algorithm>
+#include <iostream>
+#include <vector>
 
 namespace task {
     constexpr double eps = 1e-7;
