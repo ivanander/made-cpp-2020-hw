@@ -80,6 +80,7 @@ namespace task {
             output << lhs[i] << " ";
         if (!lhs.empty())
             output << lhs.back() << "\n";
+        return output;
     }
 
     void reverse (VectorDouble& lhs) {
