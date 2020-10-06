@@ -1,2 +1,5 @@
 .DS_Store
-
+/simple_compose/CMakeLists.txt
+/simple_compose/.idea
+/simple_compose/cmake-build-debug
+/vector_operations/
