@@ -3,10 +3,21 @@
 
 typedef std::function<int (int)> Op;
 
-
-
 Op compose (size_t n, Op ops[]) {
-    /// Your code goes here.
+    if (n == 0)
+        return [] (int x) { return x; };
+
+    if (n == 1)
+        return [=] (int x) { return ops[0] (x); };
+
+        auto foo =
+                [=] (int n) -> Op {
+                    return [=] (int x) {
+                        return compose(n - 1, ops) (ops[n - 1] (x));
+                    };
+                };
+
+        return foo(n);
 }
 
 
@@ -30,7 +41,8 @@ int main () {
         if (compose(4, ops)(2) != 11) {
             std::cout << "FAILED AT TEST 1" << std::endl;
             return 0;
-        }
+        } else
+            std::cout << "SUCCESS AT TEST 1" << std::endl;
     }
 
     {
@@ -38,7 +50,8 @@ int main () {
         if (compose(8, ops)(5) != 55) {
             std::cout << "FAILED AT TEST 2" << std::endl;
             return 0;
-        }
+        } else
+            std::cout << "SUCCESS AT TEST 2" << std::endl;
     }
 
     {
@@ -46,7 +59,8 @@ int main () {
         if (compose(1, ops)(3) != 4) {
             std::cout << "FAILED AT TEST 3" << std::endl;
             return 0;
-        }
+        } else
+            std::cout << "SUCCESS AT TEST 3" << std::endl;
     }
 
     {
@@ -54,7 +68,8 @@ int main () {
         if (compose(0, ops)(4) != 4) {
             std::cout << "FAILED AT TEST 4" << std::endl;
             return 0;
-        }
+        } else
+            std::cout << "SUCCESS AT TEST 4" << std::endl;
     }
 
     {
@@ -62,6 +77,17 @@ int main () {
         if (compose(4, ops)(1) != 120) {
             std::cout << "FAILED AT TEST 5" << std::endl;
             return 0;
-        }
+        } else
+            std::cout << "SUCCESS AT TEST 5" << std::endl;
     }
+
+    {
+        Op ops[4] = {op2(5), op2(5), op2(5), op2(5)};
+        if (compose(4, ops)(5) != 3125) {
+            std::cout << "FAILED AT TEST 6" << std::endl;
+            return 0;
+        } else
+            std::cout << "SUCCESS AT TEST 6" << std::endl;
+    }
+    return 0;
 }
