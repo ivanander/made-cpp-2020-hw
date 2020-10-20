@@ -165,7 +165,6 @@ class Ellipse : public Polygon {
  public:
   Ellipse(const Point& p1, const Point& p2, double distance)
       : Polygon({p1, p2}),
-        center_({(p1.x + p2.x) / 2, (p1.y + p2.y) / 2 }),
         semifoc(distance / 2) {}
 
   double perimeter() const override {
@@ -184,7 +183,9 @@ class Ellipse : public Polygon {
   }
 
   Point center() const {
-    return center_;
+    const auto& p1 = points_[0];
+    const auto& p2 = points_[1];
+    return {(p1.x + p2.x) / 2, (p1.y + p2.y) / 2 };
   }
 
   double eccentricity() const {
@@ -196,7 +197,6 @@ class Ellipse : public Polygon {
   }
 
  protected:
-  Point center_;
   double semifoc;
 };
 
@@ -220,55 +220,56 @@ class Triangle : public Polygon {
     : Polygon({p1, p2, p3}) {}
 
   Point centroid() const {
-
+    return {(points_[0].x + points_[1].x + points_[2].x) / 3, (points_[0].y + points_[1].y + points_[2].y) / 3};
   }
 
   Circle circumscribedCircle() const {
     Point center1 = { (points_[0].x + points_[1].x) / 2,
                       (points_[0].y + points_[1].y) / 2 };
-
     double coef1 = (points_[0].y - points_[1].y) /
         (points_[0].x - points_[1].x);
-
-    coef1 = -1 / coef1;
+    coef1 = -1/coef1;
     double b01 = center1.y - coef1 * center1.x;
 
     Point center2 = { (points_[0].x + points_[2].x) / 2,
                       (points_[0].y + points_[2].y) / 2 };
-
     double coef2 = (points_[0].y - points_[2].y) /
         (points_[0].x - points_[2].x);
-
     coef2 = -1 / coef2;
+    double b02 = center2.y - coef2*center2.x;
 
-    double b02 = center2.y - coef2 * center2.x;
     double x = (b02 - b01) / (coef1 - coef2);
     double y = coef1 * x + b01;
-    double R = sqrt(sqr(points_[0].x - x) + sqr(points_[0].y - y));
+
+    double R = pow(points_[0].x - x, 2) + pow(points_[0].y - y, 2);
+    R = sqrt(R);
 
     return Circle({x, y}, R);
   }
 
   Circle inscribedCircle() const {
-    Point center1 = { (points_[0].x + points_[1].x) / 2,
-                      (points_[0].y + points_[1].y) / 2 };
-    double coef1 = (points_[0].y - points_[1].y) /
-        (points_[0].x - points_[1].x);
-    coef1 = -1 / coef1;
-    double b01 = center1.y - coef1 * center1.x;
+    double p = perimeter();
+    double s = area();
+    double a = points_[0].distance(this->points_[1]);
+    double b = points_[1].distance(this->points_[2]);
+    double c = points_[2].distance(this->points_[0]);
+    double R = 2 * s / p;
 
-    Point center2 = { (points_[0].x + points_[2].x) / 2,
-                      (points_[0].y + points_[2].y) / 2 };
-    double coef2 = (points_[0].y - points_[2].y) /
-        (points_[0].x - points_[2].x);
-    coef2 = -1 / coef2;
-
-    double b02 = center2.y - coef2 * center2.x;
-    double x = (b02 - b01) / (coef1 - coef2);
-    double y = coef1 * x + b01;
-    double R = sqrt(sqr(points_[0].x - x) + sqr(points_[0].y - y));
-
-    return Circle({x, y}, R);
+    Point AB(points_[1].x - points_[0].x, points_[1].y - points_[0].y);
+    Point AC(points_[2].x - points_[0].x, points_[2].y - points_[0].y);
+    double dot = AB.x * AC.x + AB.y * AC.y;
+    double phi = acos(dot / (a * c)) / 2;
+    double lenAB = sqrt(AB.x * AB.x + AB.y * AB.y);
+    double lenBis = std::abs(R / sin(phi));
+    AB = {AB.x / lenAB * lenBis, AB.y / lenAB * lenBis};
+    Point bis = { points_[0].x + AB.x * cos(phi) - AB.y * sin(phi),
+                  points_[0].y + AB.x * sin(phi) + AB.y * cos(phi) };
+    if (!isInside(bis)) {
+      phi = -phi;
+      bis = { points_[0].x + AB.x * cos(phi) - AB.y * sin(phi),
+              points_[0].y + AB.x * sin(phi) + AB.y * cos(phi) };
+    }
+    return Circle(bis, R);
   }
 
   bool isInside(const Point& p) const {
@@ -283,9 +284,23 @@ class Triangle : public Polygon {
     return (A > 0) && (B > 0) && (C > 0);
   }
 
-  Point orthocenter() const {}
-  Line EulerLine() const {}
-  Circle ninePointsCircle() const {}
+  Point orthocenter() const {
+    const Point& A = this->points_[0];
+    const Point& B = this->points_[1];
+    const Point& C = this->points_[2];
+    auto O = circumscribedCircle().center();
+    return {A.x + B.x + C.x - 2 * O.x, A.y + B.y + C.y - 2 * O.y};
+  }
+
+  Line EulerLine() const {
+    return {centroid(), orthocenter()};
+  }
+
+  Circle ninePointsCircle() const {
+    auto circumscribed = circumscribedCircle();
+    Point center = { (circumscribed.center().x + orthocenter().x) / 2, (circumscribed.center().y + orthocenter().y) / 2};
+    return {center, circumscribed.radius() / 2};
+  }
 };
 
 class Rectangle : public Polygon {
