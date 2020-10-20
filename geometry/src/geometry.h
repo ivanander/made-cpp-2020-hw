@@ -9,8 +9,8 @@
 
 inline double sqr(double val) { return val * val; }
 
-bool are_equals(double a, double b, double eps = 1e-7) {
-  return abs(a - b) <= eps;
+bool are_equals(double a, double b, double eps = 1e-6) {
+  return fabs(a - b) <= eps;
 }
 
 struct Point {
@@ -83,15 +83,14 @@ class Polygon : public Shape {
 
   double area() const override {
     double s = 0.0;
-    for (int i = 0, j = points_.size() - 1; i < points_.size(); ++i, j = i) {
+    for (int i = 0, j = points_.size() - 1; i < points_.size(); j = i, ++i) {
       s += (points_[j].x + points_[i].x) * (points_[j].y - points_[i].y);
     }
-    return abs(s / 2.0);
+    return fabs(s / 2.0);
   }
-  
+
   bool operator==(const Shape& other) const {
     Polygon figure({});
-
     try {
       figure = dynamic_cast<const Polygon&>(other);
     } catch(const std::exception& e) {
@@ -123,8 +122,9 @@ class Polygon : public Shape {
     return !(*this == other);
   }
 
+
   void rotate(const Point& center, double angle) override {
-    angle *= M_PI / 180;
+    angle *= M_PI / 180.0;
     for (auto& point : points_) {
       Point radius_vec(point.x - center.x, point.y - center.y);
       point = { center.x + radius_vec.x * cos(angle) - radius_vec.y * sin(angle),
@@ -159,9 +159,6 @@ class Polygon : public Shape {
   std::vector<Point> getVertices() const {
     return points_;
   }
-
- protected:
-  std::vector<Point> points_;
 };
 
 class Ellipse : public Polygon {
@@ -173,9 +170,7 @@ class Ellipse : public Polygon {
 
   double perimeter() const override {
     double e = eccentricity();
-    double a = semifoc / e;
-    double b = a * sqrt(1 - sqr(e));
-    return 2.0 * M_PI * sqrt((sqr(a) + sqr(b)) / 2.0);
+    return 4 * semifoc * std::comp_ellint_2(e);
   }
 
   double area() const override {
