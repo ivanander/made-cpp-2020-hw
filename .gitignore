@@ -1,5 +1,8 @@
 .DS_Store
+/vector_operations/CMakeLists.txt
+/vector_operations/.idea
+/vector_operations/cmake-build-debug
+/vector_operations/main.cpp
 /simple_compose/CMakeLists.txt
 /simple_compose/.idea
 /simple_compose/cmake-build-debug
-/vector_operations/
